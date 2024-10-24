@@ -8,15 +8,16 @@ const userSchema = new Schema({
     network:String,
     token: String,
     tokenName: String,
-    supply: Number, // Assuming supply is a numeric value
-    shuffle: Boolean, // Assuming shuffle is a boolean
+    supply: Number,  
+    shuffle: Boolean,  
     buyEmoji: String,
-    buyStep: Number, // Assuming buyStep is a numeric value
-    minBuy: Number, // Assuming minBuy is a numeric value
-    price: Boolean, // Assuming price is a boolean
-    market: Boolean, // Assuming market is a boolean
-    chart: String, // Assuming chart can be a string, e.g., a URL
-    layout: String // Assuming layout is a string for emoji layout style
+    buyStep: Number,  
+    minBuy: Number,  
+    price: Boolean,  
+    market: Boolean,  
+    chart: String,  
+    layout: String,
+    setting:Object
   });
   
 
