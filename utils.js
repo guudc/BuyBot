@@ -1,7 +1,7 @@
 /** Utilities **/
 const { Connection, PublicKey } = require('@solana/web3.js');
 const { Metaplex } = require("@metaplex-foundation/js");
-const { getMint } = require('@solana/spl-token');
+const {Web3} = require('web3');
 const bot = require('./bot');
 
 // Function to check if an address is a valid EVM address
@@ -16,7 +16,7 @@ exports.isSol = (address) => {
     return base58Regex.test(address);
 }
 //get token information by contract address
-exports.getTokenInfo = async (chain = 'eth', tokenAddress) => {
+exports.getTokenInfo = async (chain = 'eth', tokenAddress) => { 
     //fecth the resourcess
     if(chain == 'sol'){
       // Solana mainnet endpoint
@@ -24,12 +24,24 @@ exports.getTokenInfo = async (chain = 'eth', tokenAddress) => {
       // Replace with the mint address of the Solana token
       const mintAddress = new PublicKey(tokenAddress);
       try {
-        const mintInfo = await connection.getParsedAccountInfo(mintAddress);
-        const mintTokenInfo = await getMint(connection, mintAddress);
-        const totalSupply = Number(mintTokenInfo.supply) / Math.pow(10, mintTokenInfo.decimals);
+        const mintTokenInfo = await fetch(process.env.SOL_RPC_URL, {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+              jsonrpc: "2.0",
+              id: 1,
+              method: "getTokenSupply",
+              params: [tokenAddress]
+          })
+        })
+        let totalSupply = 0;let decimal = 0;
         // Get the number of decimals
-        if (mintInfo.value.data.parsed.info) {
-          const decimal = mintInfo.value.data.parsed.info.decimals;
+        if (mintTokenInfo.ok) {
+          const res = await mintTokenInfo.json()
+          totalSupply = res?.result?.value?.uiAmount
+          decimal = res?.result?.value?.decimals
           const meta = Metaplex.make(connection);
           const tokenMetadata = await meta
             .nfts()
@@ -62,26 +74,52 @@ exports.getTokenInfo = async (chain = 'eth', tokenAddress) => {
           console.error('Error getting token info:', error);
       }
     }
-    else {
-      const chains = {'eth':1, 'bsc':56}
-      const tokens = "&addresses" + encodeURIComponent(`[1]`) + `=${tokenAddress}`;
-      const url = `https://deep-index.moralis.io/api/v2.2/erc20/metadata?chain=0x${Number(
-        chains[chain]
-      ).toString(16)}${tokens}`;
-      const resp = await fetch(url, {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          "X-API-Key": `${process.env.MORALIS_KEY}`,
-        },
-      });
-      if (resp.ok) {
-        const meta = await resp.json();
-        return {
-          name:meta[0]?.name,
-          symbol:meta[0]?.symbol,
-          supply:meta[0]?.total_supply_formatted
-        } 
+    else { 
+      // Connect to an Ethereum node (e.g., Infura or your own node)
+      const web3 = new Web3((chain=='bsc')?process.env.BSC_RPC_URL:process.env.ETH_RPC_URL);
+      // Minimal ABI with `name`, `symbol`, and `totalSupply` functions
+      const minABI = [
+          // name
+          {
+              "constant": true,
+              "inputs": [],
+              "name": "name",
+              "outputs": [{"name": "", "type": "string"}],
+              "type": "function"
+          },
+          // symbol
+          {
+              "constant": true,
+              "inputs": [],
+              "name": "symbol",
+              "outputs": [{"name": "", "type": "string"}],
+              "type": "function"
+          },
+          // totalSupply
+          {
+              "constant": true,
+              "inputs": [],
+              "name": "totalSupply",
+              "outputs": [{"name": "", "type": "uint256"}],
+              "type": "function"
+          },
+          //decimals
+          {
+            "constant": true,
+            "inputs": [],
+            "name": "decimals",
+            "outputs": [{"name": "", "type": "uint256"}],
+            "type": "function"
+        }
+      ];
+      // Create contract instance with the minimal ABI
+      const contract = new web3.eth.Contract(minABI, tokenAddress);
+      const name = await contract.methods.name().call();
+      const symbol = await contract.methods.symbol().call();
+      const totalSupply = await contract.methods.totalSupply().call();
+      const decimal = await contract.methods.decimals().call();
+      return {
+        name, symbol, decimal:Number(decimal), supply:Number(totalSupply/BigInt(10**Number(decimal)))
       }
     }
     return {}
@@ -97,9 +135,58 @@ exports.downloadFile = async (fileId) => {
       const arrayBuffer = await response.arrayBuffer();
       // Convert ArrayBuffer to Buffer for saving to file
       const buffer = Buffer.from(arrayBuffer);
-      return buffer
+      const base64String = buffer.toString('base64');
+      return base64String
   } catch (error) {
       console.error('Error downloading file:', error);
   }
   return false
 };
+//get the token balance of a user
+exports.getTokenBalance = async (contractAddress, walletAddress, network='bsc') => {
+    try {
+        const web3 = new Web3((network=='bsc')?process.env.BSC_RPC_URL:process.env.ETH_RPC_URL);
+        const minABI = [
+          // balanceOf
+          {
+              "constant": true,
+              "inputs": [{"name": "_owner", "type": "address"}],
+              "name": "balanceOf",
+              "outputs": [{"name": "balance", "type": "uint256"}],
+              "type": "function"
+          }
+        ];
+        // Create a new contract instance with the minimal ABI
+        const contract = new web3.eth.Contract(minABI, contractAddress);
+
+        // Call balanceOf method
+        const bal = await contract.methods.balanceOf(walletAddress).call();
+
+        return bal
+    } catch (error) {
+        console.error('Error fetching token balance:', error);
+    }
+}
+//clean array
+exports.clean = (arr) => {
+  return arr.filter(item => {
+    // Check for non-empty strings, numbers, booleans, and non-empty objects/arrays
+    if (typeof item === 'string') return item.trim() !== ''; // Remove empty strings
+    if (Array.isArray(item)) return item.length > 0; // Remove empty arrays
+    if (typeof item === 'object' && item !== null) return Object.keys(item).length > 0; // Remove empty objects
+    return item !== null && item !== undefined; // Remove null or undefined
+  });
+}
+//to return usd value of token by batch
+exports.getBatchUsdBal = async (token = 'eth') => {
+  const url = `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${token.toUpperCase()}&tsyms=USD&api_key=${process.env.CRYPTO_COMPARE_API} `;
+  try {
+      const resp = await fetch(url);
+      if(resp.ok) {
+          const bal = await resp.json()
+          return bal
+      }
+  } catch (error) {  
+      return false;
+  }
+}

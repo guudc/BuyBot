@@ -3,8 +3,33 @@ const {start, setup, finishUp, callbackQuery, settings} = require('./setup')
 const express = require("express")
 const {group} = require('./group')
 const bot = require('./bot'); 
+const { getAllTokens } = require('./monitor');
+const User = require('./model/user');
 /** KEEP SERVER RUNNING FOR MONGODB SAKE */
 const app = express()
+//endpoint for image and vide retrieval
+app.get('/file/:id/:group/:token', async (req, res) => {
+    const {id, group, token} = req.params
+    try {
+        if (id && group && token) {
+            const user = await User.findOne({id, group, token})
+            if(user){
+                if (user?.setting?.media?.file && user?.setting?.media?.mime) {
+                    // Set the content type and send the file data as a response
+                    res.setHeader('Content-Type', user?.setting?.media?.mime);
+                    res.send(user?.setting?.media?.file);
+                } else {
+                    res.status(404).send({ status: false, message: 'Image not found' });
+                }
+            }
+        } else {
+            res.status(404).send({ status: false });
+        }
+    } catch (e) {
+        res.status(500).send({ status: false, message: 'Internal Server Error' });
+    }
+});
+
 //configuring port
 let port =  3333
 app.listen(port, () => {
@@ -30,8 +55,9 @@ bot.on('message', (msg) => {
 //to listen to callbacks
 bot.on('callback_query', callbackQuery);
 
-// Error handling
+// // Error handling
 bot.on("polling_error", console.error);
+getAllTokens()
 console.log('Running Bot') 
 
 
