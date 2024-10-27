@@ -105,6 +105,13 @@ exports.finishUp = async  (msg) => {
                     mime = "video/mp4"
                 }
                 else{bot.sendMessage(chatId, `🚫 Max size exceeded.\nSend a file lesser than ${process.env.MAX_FILE_SIZE/1E6}mb.`);return;}
+            } else if (msg.animation) {
+                if(msg.animation.file_size <= process.env.MAX_FILE_SIZE){
+                    fileId = msg.animation.file_id;
+                    file = await downloadFile(fileId);
+                    mime = msg?.animation?.mime_type || "video/mp4"
+                }
+                else{bot.sendMessage(chatId, `🚫 Max size exceeded.\nSend a file lesser than ${process.env.MAX_FILE_SIZE/1E6}mb.`);return;}
             } else if (msg.document && msg.document.mime_type.indexOf('gif') > -1) { 
                 if(msg.document.file_size <= process.env.MAX_FILE_SIZE){
                     fileId = msg.document.file_id;

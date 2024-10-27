@@ -100,7 +100,7 @@ exports.getAllTokens = async () => {
         }
         //fetch the current price
         syncUsdVal() //services to sync usd
-        kickOff() //start monitoring buys
+      //  kickOff() //start monitoring buys
     }catch(e){console.log(e)}
 }
 //start monitoring
@@ -246,8 +246,8 @@ const kickOff = () => {
                 }
             }
             //fetch the next batch in the next 4s
-            setTimeout(processBsc, 4000)
         } catch (error) {console.error('Error fetching latest block:', error);}
+        setTimeout(processBsc, 4000)
     }
     //for eth
     const processEth = async () => {
@@ -324,9 +324,9 @@ const kickOff = () => {
                     }
                 }
             }
-            //fetch the next batch in the next 15
-            setTimeout(processEth, 15000)
         } catch (error) {console.error('Error fetching latest block:', error);}
+        //fetch the next batch in the next 15
+        setTimeout(processEth, 15000)
     }
     processBsc()
     processEth()
