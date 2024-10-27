@@ -469,15 +469,15 @@ const tokenDashboard = async (chatId, update=false) => {
     try{
         if(USERS[chatId]){
             USERS[chatId]['state'] = 'done' //reset state
-            let msg = "ℹ️ Coat TestBot lets you track real-time buy trades seamlessly. Stay updated on every trade with instant notifications."
-            msg += "\n\n↗️ Current group: " + USERS[chatId]['groupName'] + "\n⤵️ Token Info:\nName: " + USERS[chatId]['tokenName'] + "\nAddress: " + USERS[chatId]['token'] + ".\nToken Supply: " + USERS[chatId]['supply'] + "\n⤴️ Chain: " + USERS[chatId]['network']
+            let msg = "😎 Coat TestBot lets you track real-time buy trades seamlessly. Stay updated on every trade with instant notifications🤖."
+            msg += "\n\n⚪ Current group: " + USERS[chatId]['groupName'] + "\n⚪Token Name: " + USERS[chatId]['tokenName'] + "\n⚪Address: " + USERS[chatId]['token'] + ".\n⚪Token Supply: " + USERS[chatId]['supply'] + "\n⚪ Chain: " + USERS[chatId]['network'].toUpperCase()
             //construct the settings
             const options = {
                 reply_markup: {
                     inline_keyboard: [
                         [
                             {
-                                text: `📷 Set display Media`, // Button text
+                                text: `👓 Set display media`, // Button text
                                 callback_data: 'media_setting' // Custom callback data
                             },
                             {
