@@ -33,10 +33,10 @@ exports.setup = (msg) => {
         const chatId = msg.chat.id;
         if (msg.chat.type !== 'supergroup' || msg.chat.type !== 'group') {
             const setUpMsg = `
-    ❔ Add ${process.env.BOT_USER_NAME} to your group and head back to this chat.
+❔ Add ${process.env.BOT_USER_NAME} to your group and head back to this chat.
 
-    If the bot has already being added, send the /start command from the group to trigger the setup process.
-    Only an admin of the group can do this.
+If the bot has already being added, send the /start command from the group to trigger the setup process.
+Only an admin of the group can do this.
     `
             // Send the welcome message
             bot.sendMessage(chatId, setUpMsg);
@@ -470,7 +470,7 @@ const tokenDashboard = async (chatId, update=false) => {
         if(USERS[chatId]){
             USERS[chatId]['state'] = 'done' //reset state
             let msg = "😎 Coat TestBot lets you track real-time buy trades seamlessly. Stay updated on every trade with instant notifications🤖."
-            msg += "\n\n⚪ Current group: " + USERS[chatId]['groupName'] + "\n⚪Token Name: " + USERS[chatId]['tokenName'] + "\n⚪Address: " + USERS[chatId]['token'] + ".\n⚪Token Supply: " + USERS[chatId]['supply'] + "\n⚪ Chain: " + USERS[chatId]['network'].toUpperCase()
+            msg += "\n\n✳️ Current group: " + USERS[chatId]['groupName'] + "\n✳️Token Name: " + USERS[chatId]['tokenName'] + "\n✳️Address: " + USERS[chatId]['token'] + ".\n✳️Token Supply: " + USERS[chatId]['supply'] + "\n✳️ Chain: " + USERS[chatId]['network'].toUpperCase()
             //construct the settings
             const options = {
                 reply_markup: {
