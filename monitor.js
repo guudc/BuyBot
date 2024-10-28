@@ -122,8 +122,8 @@ const kickOff = () => {
     const ethWeb3 = new Web3(process.env.ETH_RPC_URL);
     //for sol
     const procesTx = async () => {  
-        const sigs = LOGS.slice(0, 20);
-        LOGS = LOGS.slice(20)
+        const sigs = LOGS.slice(0, 1);
+        LOGS = LOGS.slice(1)
         try{
             if(sigs.length>0){ 
                 const txs = (await connection.getParsedTransactions(sigs, {maxSupportedTransactionVersion:0}));
@@ -328,8 +328,8 @@ const kickOff = () => {
         //fetch the next batch in the next 15
         setTimeout(processEth, 15000)
     }
-    processBsc()
-    processEth()
+    //processBsc()
+    //processEth()
     procesTx()
 }
 //to send message to group
