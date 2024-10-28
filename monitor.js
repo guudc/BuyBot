@@ -100,7 +100,7 @@ exports.getAllTokens = async () => {
         }
         //fetch the current price
         syncUsdVal() //services to sync usd
-      //  kickOff() //start monitoring buys
+        kickOff() //start monitoring buys
     }catch(e){console.log(e)}
 }
 //start monitoring
