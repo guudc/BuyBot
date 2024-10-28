@@ -330,7 +330,7 @@ const kickOff = () => {
     }
     //processBsc()
     //processEth()
-    procesTx()
+    //procesTx()
 }
 //to send message to group
 const infoGroup = async (token, tokBal, postBal, preBal, trader, hash, network='sol') => {
@@ -494,12 +494,18 @@ ${(setting?.chart == 'DexScreener')?'<a href="' + params?.dex + '">Screener</a>'
 }
 //synce usd value
 const syncUsdVal = async () => {
-    const res = await getBatchUsdBal('eth,sol,bnb')
-    if(res) {
-        NETWORK_PRICE['eth'] = res['ETH']['USD']
-        NETWORK_PRICE['sol'] = res['SOL']['USD']
-        NETWORK_PRICE['bsc'] = res['BNB']['USD']
+    const eth = await getBatchUsdBal('ethereum')
+    const bsc = await getBatchUsdBal('binancecoin')
+    const sol = await getBatchUsdBal('solana')
+    if(eth && bsc && sol) {
+        NETWORK_PRICE['eth'] = eth
+        NETWORK_PRICE['sol'] = bsc
+        NETWORK_PRICE['bsc'] = sol
+        setTimeout(syncUsdVal, 86400*1E3) //refresh in the next 24 hrs
     }
-    setTimeout(syncUsdVal, 86400*1E3) //refresh in the next 24 hrs
+    else {
+        setTimeout(syncUsdVal, 10000) //refresh in the 10s
+    }
+    console.log(NETWORK_PRICE)
 }
 

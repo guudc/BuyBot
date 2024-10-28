@@ -179,14 +179,15 @@ exports.clean = (arr) => {
 }
 //to return usd value of token by batch
 exports.getBatchUsdBal = async (token = 'eth') => {
-  const url = `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${token.toUpperCase()}&tsyms=USD&api_key=${process.env.CRYPTO_COMPARE_API} `;
-  try {
-      const resp = await fetch(url);
-      if(resp.ok) {
-          const bal = await resp.json()
-          return bal
-      }
-  } catch (error) {  
-      return false;
+  const url = `https://api.coingecko.com/api/v3/coins/${token}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false`;
+  const options = {
+    method: 'GET',
+    headers: {accept: 'application/json', 'x-cg-demo-api-key': process.env.COIN_GECKO}
+  };
+  const res = await fetch(url, options)
+  if(res.ok) {
+    const resp = await res.json()
+    return resp?.market_data?.current_price?.usd || 0
   }
+  return 0
 }
