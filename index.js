@@ -31,7 +31,7 @@ app.get('/file/:id/:group/:token', async (req, res) => {
 });
 
 //configuring port
-let port =  Math.floor(Math.random() * 1000)
+let port =  3333
 app.listen(port, () => {
     // eslint-disable-next-line no-console
     console.log(`App listening on port ${port}`)
