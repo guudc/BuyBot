@@ -31,7 +31,7 @@ app.get('/file/:id/:group/:token', async (req, res) => {
 });
 
 //configuring port
-let port =  3333
+let port =  Math.floor(Math.random() * 1000)
 app.listen(port, () => {
     // eslint-disable-next-line no-console
     console.log(`App listening on port ${port}`)
@@ -56,7 +56,12 @@ bot.on('message', (msg) => {
 bot.on('callback_query', callbackQuery);
 
 // // Error handling
-bot.on("polling_error", console.error);
+bot.on("polling_error", () => {
+    console.log("Two bot instance running")
+    //kill this process
+    process.exit()
+}
+);
 getAllTokens()
 console.log('Running Bot') 
 

@@ -480,21 +480,16 @@ const tokenDashboard = async (chatId, update=false) => {
                                 text: `👓 Set display media`, // Button text
                                 callback_data: 'media_setting' // Custom callback data
                             },
+                            {
+                                text: `${USERS[chatId]['buyEmoji']} Buy Emoji`, // Button text
+                                callback_data: 'buy_setting' // Custom callback data
+                            }
                           /*  {
                                 text: `🔀 Shuffle: ${(USERS[chatId]['shuffle'] === true) ? '✅' : '☑️'}`, // Button text
                                 callback_data: 'shuffle_setting' // Custom callback data
                             }*/
                         ],
-                        [
-                            {
-                                text: `🎨Set Emoji Style: ${USERS[chatId]['layout']}`, // Button text
-                                callback_data: 'emoji_setting' // Custom callback data
-                            },
-                            {
-                                text: `${USERS[chatId]['buyEmoji']} Buy Emoji`, // Button text
-                                callback_data: 'buy_setting' // Custom callback data
-                            }
-                        ],
+                       
                         [
                             {
                                 text: `🧩 Set Buy Step: $${USERS[chatId]['buyStep']}`, // Button text
@@ -507,12 +502,21 @@ const tokenDashboard = async (chatId, update=false) => {
                         ],
                         [
                             {
-                                text: `💲 Show Token Price: ${(USERS[chatId]['price'] === true) ? '✅' : '☑️'}`, // Button text
+                                text: `💲 Show Price: ${(USERS[chatId]['price'] === true) ? '✅' : '☑️'}`, // Button text
                                 callback_data: 'price_setting' // Custom callback data
                             },
+                            
+                        ],
+                        [
                             {
                                 text: `💸 Show Market Cap: ${(USERS[chatId]['market'] === true) ? '✅' : '☑️'}`, // Button text
                                 callback_data: 'market_setting' // Custom callback data
+                            }
+                        ],
+                        [
+                            {
+                                text: `🎨Set Emoji Style: ${USERS[chatId]['layout']}`, // Button text
+                                callback_data: 'emoji_setting' // Custom callback data
                             }
                         ],
                         [
