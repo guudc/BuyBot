@@ -480,10 +480,10 @@ const tokenDashboard = async (chatId, update=false) => {
                                 text: `👓 Set display media`, // Button text
                                 callback_data: 'media_setting' // Custom callback data
                             },
-                            {
+                          /*  {
                                 text: `🔀 Shuffle: ${(USERS[chatId]['shuffle'] === true) ? '✅' : '☑️'}`, // Button text
                                 callback_data: 'shuffle_setting' // Custom callback data
-                            }
+                            }*/
                         ],
                         [
                             {
